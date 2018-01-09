@@ -19,6 +19,8 @@ client.on('error', err => {
   console.error(err);
 });
 
+app.use(cors());
+
 app.get('/test', (req, res) => res.send('hello world'));
 
 app.get('/api/v1/books', (req, res) => {
