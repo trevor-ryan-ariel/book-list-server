@@ -23,6 +23,7 @@ app.use(cors());
 
 app.get('/test', (req, res) => res.send('hello world'));
 
+//get all
 app.get('/api/v1/books', (req, res) => {
   client.query(`
         SELECT book_id, title, author, image_url FROM books;
@@ -30,5 +31,31 @@ app.get('/api/v1/books', (req, res) => {
     .then(result => res.send(result.rows))
     .catch(err => console.error(err));
 });
+
+//get one
+app.get('/api/v1/books/:id', (req, res) => {
+    client.query(`
+    SELECT * FROM books WHERE book_id=${req.params.id}
+`).then(result => res.send(result.rows[0])
+    .catch(err => console.error(err))
+});
+
+//post
+app.post('/api/v1/books', express.json(), express.urlencoded({extended:true}), (req, res) => {
+    client.query(`
+        INCERT INTO books 
+            (title, author, image_url, isbn, description)
+            VALUES($1, $2, $3, $4, $5);
+    `,[
+        req.body.title,
+        req.body.author,
+        req.body.image_url,
+        req.body.isbn,
+        req.body.description
+    ])
+        
+    .then(result => res.send('incerted successfully'))
+    .catch(err => console.error(err))
+})
 
 app.listen(PORT, () => console.log('server started on port' + PORT));
