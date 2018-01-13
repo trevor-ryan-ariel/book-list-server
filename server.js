@@ -57,8 +57,8 @@ app.post('/api/v1/books', express.json(), express.urlencoded({extended:true}), (
       req.body.isbn,
       req.body.description
     ])
-        
-    .then(result => result.send('inserted successfully'))
+
+    .then(() => res.send('inserted successfully'))
     .catch(err => console.error(err))
 })
 
