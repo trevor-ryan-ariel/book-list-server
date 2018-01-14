@@ -12,9 +12,9 @@ const app = express();
 //consString for Trevor
 // const DATABASE_URL = process.env.DATABASE_URL || 'postgres://trevorjdobson:1234@localhost:5432/books_app';
 //conString for Ryan
-//const DATABASE_URL = process.env.DATABASE_URL || 'postgres://localhost:5432/books_app';
+const DATABASE_URL = process.env.DATABASE_URL || 'postgres://localhost:5432/books_app';
 //conString for Ariel
-const DATABASE_URL = process.env.DATABASE_URL || 'postgres://postgres:1234@localhost:5432/books_app';
+// const DATABASE_URL = process.env.DATABASE_URL || 'postgres://postgres:1234@localhost:5432/books_app';
 
 const client = new pg.Client(DATABASE_URL);
 client.connect();
@@ -23,7 +23,9 @@ client.on('error', err => {
 });
 
 app.use(cors());
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.urlencoded({
+  extended: true
+}))
 
 app.get('/test', (req, res) => res.send('hello world'));
 
@@ -45,12 +47,14 @@ app.get('/api/v1/books/:id', (req, res) => {
 });
 
 //post
-app.post('/api/v1/books', express.json(), express.urlencoded({extended:true}), (req, res) => {
+app.post('/api/v1/books', express.json(), express.urlencoded({
+  extended: true
+}), (req, res) => {
   client.query(`
         INSERT INTO books 
             (title, author, image_url, isbn, description)
             VALUES($1, $2, $3, $4, $5);
-    `,[
+    `, [
       req.body.title,
       req.body.author,
       req.body.image_url,
@@ -58,7 +62,27 @@ app.post('/api/v1/books', express.json(), express.urlencoded({extended:true}), (
       req.body.description
     ])
 
-    .then(() => res.send('inserted successfully'))
+    .then(() => res.send('new book added'))
+    .catch(err => console.error(err))
+})
+
+//update
+app.put('/api/v1/books/:id', express.json(), express.urlencoded({
+  extended: true
+}), (req, res) => {
+  console.log(req.body)
+  client.query(`
+        UPDATE books 
+            SET title='${req.body.title}',
+            author='${req.body.author}',
+            image_url='${req.body.image_url}',
+            isbn='${req.body.isbn}',
+            description='${req.body.description}'
+
+            WHERE book_id=${req.body.book_id};
+    `)
+
+    .then(() => res.send('update successful'))
     .catch(err => console.error(err))
 })
 
