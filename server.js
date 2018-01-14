@@ -70,7 +70,6 @@ app.post('/api/v1/books', express.json(), express.urlencoded({
 app.put('/api/v1/books/:id', express.json(), express.urlencoded({
   extended: true
 }), (req, res) => {
-  console.log(req.body)
   client.query(`
         UPDATE books 
             SET title='${req.body.title}',
@@ -78,12 +77,17 @@ app.put('/api/v1/books/:id', express.json(), express.urlencoded({
             image_url='${req.body.image_url}',
             isbn='${req.body.isbn}',
             description='${req.body.description}'
-
             WHERE book_id=${req.body.book_id};
     `)
-
-    .then(() => res.send('update successful'))
-    .catch(err => console.error(err))
+    .then(() => res.sendStatus(200, ' ok'))
+    // .catch(err => console.error(err, req, res))
 })
 
-app.listen(PORT, () => console.log('server started on port' + PORT));
+//delete
+app.delete('/api/v1/books/:id', (req, res) => {
+  client.query(`
+      DELETE FROM books WHERE book_id=${req.params.id};
+  `)
+})
+
+app.listen(PORT, () => console.log('server started on port ' + PORT));
